@@ -746,6 +746,17 @@ func (issue *Issue) ChangeRef(doer *User, oldRef string) (err error) {
 		return fmt.Errorf("loadRepo: %v", err)
 	}
 
+	if _, err = createComment(sess, &CreateCommentOptions{
+		Type:     CommentTypeRefChange,
+		Doer:     doer,
+		Repo:     issue.Repo,
+		Issue:    issue,
+		OldRef:   oldRef,
+		NewRef:   issue.Ref,
+	}); err != nil {
+		return fmt.Errorf("createComment: %v", err)
+	}
+
 	return sess.Commit()
 }
 

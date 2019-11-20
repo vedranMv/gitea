@@ -82,6 +82,8 @@ const (
 	CommentTypeLock
 	// Unlocks a previously locked issue
 	CommentTypeUnlock
+	// Change branch/tag in an issue
+	CommentTypeRefChange
 )
 
 // CommentTag defines comment tag type
@@ -155,6 +157,9 @@ type Comment struct {
 	RefRepo    *Repository `xorm:"-"`
 	RefIssue   *Issue      `xorm:"-"`
 	RefComment *Comment    `xorm:"-"`
+
+	OldRef       string
+	NewRef       string
 }
 
 // LoadIssue loads issue from database
@@ -526,6 +531,8 @@ func createComment(e *xorm.Session, opts *CreateCommentOptions) (_ *Comment, err
 		RefCommentID:     opts.RefCommentID,
 		RefAction:        opts.RefAction,
 		RefIsPull:        opts.RefIsPull,
+		OldRef:           opts.OldRef,
+		NewRef:           opts.NewRef,
 	}
 	if _, err = e.Insert(comment); err != nil {
 		return nil, err
@@ -759,6 +766,8 @@ type CreateCommentOptions struct {
 	RefAction        references.XRefAction
 	RefIsPull        bool
 	NoAction         bool
+	OldRef           string
+	NewRef           string
 }
 
 // CreateComment creates comment of issue or commit.
